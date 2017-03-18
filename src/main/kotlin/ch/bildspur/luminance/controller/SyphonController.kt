@@ -1,7 +1,9 @@
 package ch.bildspur.luminance.controller
 
+import codeanticode.syphon.SyphonClient
 import codeanticode.syphon.SyphonServer
 import processing.core.PApplet
+import processing.core.PGraphics
 import processing.core.PImage
 
 /**
@@ -9,13 +11,24 @@ import processing.core.PImage
  */
 class SyphonController(internal var sketch: PApplet) {
 
-    internal var syphon: SyphonServer? = null
+    lateinit var syphonOut: SyphonServer
+    lateinit var syphonIn : SyphonClient
 
-    fun setupSyphon(name: String) {
-        syphon = SyphonServer(sketch, name)
+    fun setupSyphonOutput(name: String) {
+        syphonOut = SyphonServer(sketch, name)
+    }
+
+    fun setupSyphonInput()
+    {
+        syphonIn = SyphonClient(sketch)
+    }
+
+    fun getGraphics() : PGraphics
+    {
+        return syphonIn.getGraphics(null)
     }
 
     fun sendImageToSyphon(p: PImage) {
-        syphon!!.sendImage(p)
+        syphonOut.sendImage(p)
     }
 }

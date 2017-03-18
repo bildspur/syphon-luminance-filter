@@ -8,7 +8,7 @@ import processing.opengl.PShader
 /**
  * Created by cansik on 18.03.17.
  */
-class PostFX(val applet : PApplet, val width: Int, val height: Int) {
+class PostFX(val applet : PApplet, var width: Int, var height: Int) {
     private val PASS_NUMBER = 2
     private val SHADER_PATH = Paths.get(applet.sketchPath(), "shader")
     private val resolution: IntArray = intArrayOf(width, height)
@@ -34,6 +34,21 @@ class PostFX(val applet : PApplet, val width: Int, val height: Int) {
 
         // load shaders
         loadShaders()
+    }
+
+    fun initSize(width: Int, height: Int)
+    {
+        this.width = width
+        this.height = height
+
+        resolution[0] = width
+        resolution[1] = height
+
+        (0 .. PASS_NUMBER).forEach {
+            val g = applet.createGraphics(width, height, PApplet.P2D)
+            g.noSmooth()
+            passBuffers[it] = g
+        }
     }
 
     private fun loadShaders() {
