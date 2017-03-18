@@ -3,6 +3,7 @@ package ch.bildspur.luminance
 import ch.bildspur.luminance.controller.SyphonController
 import ch.bildspur.luminance.fx.PostFX
 import ch.bildspur.luminance.util.format
+import ch.bildspur.luminance.util.imageRect
 import controlP5.ControlP5
 import processing.core.PApplet
 import processing.core.PConstants
@@ -40,6 +41,11 @@ class Sketch : PApplet() {
     lateinit var cp5: ControlP5
 
     lateinit var fx : PostFX
+
+    var brightPass = 0.8f
+    var blur = 0
+    var sigma = 1f
+    var brightness = 0.0f
 
     init {
 
@@ -87,13 +93,17 @@ class Sketch : PApplet() {
 
         // create filtered image
         fx.filter(input)
-                .sobel()
+                .brightPass(brightPass)
+                .blur(blur, sigma, false)
+                .blur(blur, sigma, true)
+                .luminosity(brightness)
                 .close(outputCanvas)
 
         syphon.sendImageToSyphon(outputCanvas)
 
 
-        image(outputCanvas, 0f, 0f, width.toFloat(), height.toFloat())
+        // draw output
+        g.imageRect(outputCanvas, 0f, 0f, 400f, 280f)
         cp5.draw()
         drawFPS()
     }
@@ -109,16 +119,45 @@ class Sketch : PApplet() {
     }
 
     fun setupUI() {
-        val h = 400f
+        val h = 295f
         val w = 20f
 
-        cp5.addSlider("threshold")
-                .setPosition(w, h)
-                .setSize(120, 20)
-                .setValue(0f)
-                .setRange(0f, 255f)
-                .onChange { e ->
+        val w2 = 200f
 
+        cp5.addSlider("bright pass")
+                .setPosition(w, h)
+                .setSize(120, 15)
+                .setValue(brightPass)
+                .setRange(0f, 1f)
+                .onChange { e ->
+                    brightPass = e.controller.value
+                }
+
+        cp5.addSlider("blur")
+                .setPosition(w, h + 25)
+                .setSize(120, 15)
+                .setValue(blur.toFloat())
+                .setRange(0f, 50f)
+                .onChange { e ->
+                    blur = e.controller.value.toInt()
+                }
+
+        cp5.addSlider("sigma")
+                .setPosition(w, h + 50)
+                .setSize(120, 15)
+                .setValue(sigma)
+                .setRange(1f, 50f)
+                .onChange { e ->
+                    sigma = e.controller.value
+                }
+
+        cp5.addSlider("luminosity")
+                .setPosition(w2, h)
+                .setSize(120, 15)
+                .setValue(brightness)
+                .setRange(0f, 1f)
+                .onChange { e ->
+                    brightness = e.controller.value
                 }
     }
 }

@@ -1,6 +1,7 @@
 package ch.bildspur.luminance.util
 
 import processing.core.PGraphics
+import processing.core.PImage
 import java.lang.String
 
 
@@ -22,4 +23,10 @@ fun PGraphics.draw(block: (g: PGraphics) -> Unit) {
 fun PGraphics.cross(x: Float, y: Float, size: Float) {
     this.line(x, y - size, x, y + size)
     this.line(x - size, y, x + size, y)
+}
+
+fun PGraphics.imageRect(image : PImage, x : Float, y : Float, width : Float, height : Float)
+{
+    val ratio = if(width - image.width < height - image.height) width / image.width else height / image.height
+    this.image(image, x, y, image.width * ratio, image.height * ratio)
 }

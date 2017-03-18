@@ -19,6 +19,7 @@ class PostFX(val applet : PApplet, var width: Int, var height: Int) {
     private var brightPassShader: PShader? = null
     private var blurShader: PShader? = null
     private var sobelShader: PShader? = null
+    private var luminosityShader : PShader? = null
 
     // frameBuffer
     private val passBuffers: Array<PGraphics>
@@ -55,6 +56,7 @@ class PostFX(val applet : PApplet, var width: Int, var height: Int) {
         brightPassShader = applet.loadShader(Paths.get(SHADER_PATH.toString(), "brightPassFrag.glsl").toString())
         blurShader = applet.loadShader(Paths.get(SHADER_PATH.toString(), "blurFrag.glsl").toString())
         sobelShader = applet.loadShader(Paths.get(SHADER_PATH.toString(), "sobelFrag.glsl").toString())
+        luminosityShader = applet.loadShader(Paths.get(SHADER_PATH.toString(), "luminosityShader.glsl").toString())
     }
 
     private fun increasePass() {
@@ -144,6 +146,23 @@ class PostFX(val applet : PApplet, var width: Int, var height: Int) {
 
         pass.beginDraw()
         pass.shader(sobelShader)
+        pass.image(currentPass, 0f, 0f)
+        pass.endDraw()
+
+        increasePass()
+
+        return this
+    }
+
+    fun luminosity(brightness : Float) : PostFX
+    {
+        val pass = nextPass
+        clearPass(pass)
+
+        luminosityShader!!.set("brightness", brightness)
+
+        pass.beginDraw()
+        pass.shader(luminosityShader)
         pass.image(currentPass, 0f, 0f)
         pass.endDraw()
 
